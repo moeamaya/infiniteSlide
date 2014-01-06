@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv='Content-type' content='text/html; charset=utf-8'>
+    <title>Basic Example</title>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="jquery.animate-enhanced.min.js"></script>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      #infinite{
+        position: relative;;
+        border: 2px solid #333;
+        overflow: hidden;
+      }
+      #infinite > ul {
+        position: relative;
+        height: 200px;
+        list-style: none;
+        padding: 0;
+      }
+      #infinite > ul > li {
+        height: 100%;
+        width: 200px;
+        border: 1px solid red;
+        float: left;
+        opacity: .5;
+      }
+      #infinite > ul > li.infinite-active {
+        opacity: 1.0;
+        border: 1px solid blue;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Basic Example</h1>
+    <div id="infinite">
+      <ul>
+        <li>one</li>
+        <li style="width:300px">two</li>
+        <li>three</li>
+      </ul>
+    </div>
+    <div id="infinite-prev">PREV</div>
+    <div id="infinite-next">NEXT</div>
+
+
+    <script src="infiniteSlide.js"></script>
+    <script>
+      $("#infinite").infiniteSlide();
+    </script>
+
+  </body>
+</html>
