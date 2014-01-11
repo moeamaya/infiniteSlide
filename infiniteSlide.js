@@ -18,6 +18,9 @@
 
     var $slideList = self.$el.find("ul");
     var $slides = $slideList.children();
+    var $currentSlide
+    var $prev = $("#infinite-prev");
+    var $next = $("#infinite-next");
 
     self.defaults = {
       "speed": 700,
@@ -27,11 +30,14 @@
     var meta = self.$el.data(name + "-opts");
     self.opts = $.extend(self.defaults, opts, meta);
 
+
     //
     //
     var init = function(){
       // get width of all slides combined
       var width = 0;
+      var length = $slides.length
+
       $slides.each( function() {
         width += $(this).outerWidth(true);
       });
@@ -41,14 +47,24 @@
       $slideList.width(width*2);
       $slides.clone(true).appendTo( $slideList );
 
-      // set active class on first slide
-      // fade rest of slides
-      $slides.first().addClass("infinite-active");
+      // reset $slides to include cloned objects
+      $slides = $slideList.children();
+
+      // set first slide to first object in cloned group
+      $currentSlide = $slides.eq( length ).addClass("infinite-active");;
+      console.log($currentSlide);
+      var position = $currentSlide.position().left;
+
+      //move slider to first object in cloned group
+      var newLeft = position * -1;
+      $slideList.css('left', newLeft + 'px');
     };
 
     //
     //
     var setSliderPosition = function(position, $el, delta) {
+      // set the global currentSlide
+
       $slideList.animate({"left": position}, {
         duration: self.defaults.speed,
         complete: function(){
@@ -60,39 +76,44 @@
     //
     //
     var makeInfinite = function($el, delta) {
-      console.log(delta);
+      var moveImg, oldLeft;
       for (var i = 0; i < Math.abs(delta); i++){
         if (delta < 0){
-          var moveImg = $("#infinite li:last");
+          moveImg = $("#infinite li:last");
           $("#infinite li:first").before(moveImg);
-          var oldLeft = $slideList.offset().left;
-          console.log(oldLeft);
-          $slideList.offset( {left: oldLeft - moveImg.outerWidth( true )} )
+          oldLeft = $slideList.offset().left;
+          $slideList.offset( {left: oldLeft - moveImg.outerWidth( true )} );
         } else {
-          var moveImg = $('#infinite li:first');
-          $('#infinite li:last').after( moveImg );
-          var oldLeft = $slideList.offset().left;
-          $slideList.offset( {left: oldLeft + moveImg.outerWidth( true )} )
-        };
+          moveImg = $("#infinite li:first");
+          $("#infinite li:last").after( moveImg );
+          oldLeft = $slideList.offset().left;
+          $slideList.offset( {left: oldLeft + moveImg.outerWidth( true )} );
+        }
       }
-
     };
 
+    // click handlers
     //
-    //
-    var $next = $("#infinite-next");
+    $prev.on("click", function() {
+      console.log("prev");
+      self.prev();
+    });
+
     $next.on("click", function() {
       console.log("next");
+      self.next();
     });
 
     $slides.on("click", function(){
-      self.next(this);
+      console.log("select");
+      self.select(this);
     });
 
     //
     //
-    self.next = function(el) {
+    self.select = function(el) {
       var $el = $(el);
+      $currentSlide = $el;
       var newIndex = $el.index();
       var oldIndex = $(".infinite-active").index();
       var delta = newIndex - oldIndex;
@@ -107,7 +128,30 @@
     //
     //
     self.prev = function() {
+      var $el = $currentSlide.prev();
+      console.log($el);
+      $currentSlide = $el;
 
+      $el.siblings().removeClass("infinite-active");
+      $el.addClass("infinite-active");
+
+      var delta = -1;
+      var position = $el.position().left * -1;
+      setSliderPosition(position, $el, delta);
+    };
+
+    //
+    //
+    self.next = function() {
+      var $el = $currentSlide.next();
+      $currentSlide = $el;
+
+      $el.siblings().removeClass("infinite-active");
+      $el.addClass("infinite-active");
+
+      var delta = 1;
+      var position = $el.position().left * -1;
+      setSliderPosition(position, $el, delta);
     };
 
     init();
