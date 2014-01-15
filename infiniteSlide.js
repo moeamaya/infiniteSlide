@@ -18,7 +18,7 @@
 
     var $slideList = self.$el.find("ul");
     var $slides = $slideList.children();
-    var $currentSlide
+    var $currentSlide;
     var $prev = $("#infinite-prev");
     var $next = $("#infinite-next");
 
@@ -34,30 +34,47 @@
     //
     //
     var init = function(){
-      // get width of all slides combined
-      var width = 0;
-      var length = $slides.length
+      // get orig length of slides
+      var length = $slides.length;
 
-      $slides.each( function() {
-        width += $(this).outerWidth(true);
-      });
-
-      // clone list to fill the horizontal width
-      // of the screen
-      $slideList.width(width*2);
-      $slides.clone(true).appendTo( $slideList );
+      // clone slides
+      cloneSlides();
 
       // reset $slides to include cloned objects
       $slides = $slideList.children();
 
       // set first slide to first object in cloned group
-      $currentSlide = $slides.eq( length ).addClass("infinite-active");;
-      console.log($currentSlide);
+      $currentSlide = $slides.eq( length ).addClass("infinite-active");
+
       var position = $currentSlide.position().left;
 
       //move slider to first object in cloned group
       var newLeft = position * -1;
-      $slideList.css('left', newLeft + 'px');
+      $slideList.css("left", newLeft + "px");
+    };
+
+    //
+    // Clone slides to fill the full width of screen
+    var cloneSlides = function() {
+      var windowWidth = $(window).width();
+
+      // get width of all slides combined
+      var width = 0;
+      $slides.each( function() {
+        width += $(this).outerWidth(true);
+      });
+
+      // determine number of clones needed
+      var clones = Math.ceil(windowWidth / width);
+
+      // set slideList width so floated elements stay
+      // in a single row
+      $slideList.width(width * (clones + 1));
+
+      // cloning and adding to DOM
+      for (var i = 0; i < clones; i++) {
+        $slides.clone(true).appendTo($slideList);
+      }
     };
 
     //
